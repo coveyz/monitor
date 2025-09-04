@@ -1,0 +1,24 @@
+{
+  "name": "@coveyz/monitor-utils",
+  "version": "0.0.2",
+  "description": "",
+  "main": "dist/index.global.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "unpkg": "dist/index.global.js",
+  "scripts": {
+    "build": "encode-bundle src/index.ts --format iife,cjs,esm --dts --minify --global-name monitor",
+    "clean": "rimraf dist node_modules"
+  },
+  "keywords": [],
+  "author": "coveyz",
+  "license": "ISC",
+  "devDependencies": {
+    "encode-bundle": "^1.4.1"
+  },
+  "dependencies": {
+    "@coveyz/monitor-core": "workspace:^",
+    "@coveyz/monitor-shared": "workspace:^",
+    "@coveyz/monitor-types": "workspace:^"
+  }
+}
