@@ -75,6 +75,12 @@ importers:
       '@coveyz/monitor-core':
         specifier: workspace:^
         version: link:../core
+      '@coveyz/monitor-shared':
+        specifier: workspace:^
+        version: link:../shared
+      '@coveyz/monitor-utils':
+        specifier: workspace:^
+        version: link:../utils
 
   packages/utils:
     dependencies:
