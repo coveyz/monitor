@@ -1,12 +1,18 @@
-import type { Breadcrumb } from '@coveyz/monitor-core';
+import type { Breadcrumb, TransportData } from '@coveyz/monitor-core';
+import type { Logger } from '@coveyz/monitor-utils';
+import type { EventTypes } from '@coveyz/monitor-shared';
+
+import type { DeviceInfo } from './track';
 
 export interface MonitorSupport {
-    logger: any,
+    logger: Logger,
     breadcrumb: Breadcrumb,
-    transportData: any,
-    replaceFlag: any,
+    transportData: TransportData,
+    replaceFlag: { [key in EventTypes]?: boolean },
     record?: any[],
-    deviceInfo?: any,
+    deviceInfo?: DeviceInfo,
+    //TODO: type
+    options: any;
     track?: any;
 };
 

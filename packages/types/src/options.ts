@@ -1,10 +1,17 @@
+import type { Breadcrumb } from '@coveyz/monitor-core';
+
+import type { BreadcrumbPushData } from './breadcrumb';
+import type { TransportDataType } from './transportData';
+
+type CANCEL = null | undefined | boolean;
+
 export interface SilentEventType {
     /** 🍇 静默监控 Xhr事件 */
     silentXhr?: boolean;
     /** 🍇 静默监控 Fetch事件 */
     silentFetch?: boolean;
     /** 🍇 静默监控 Console事件 */
-    silentConsole?:boolean;
+    silentConsole?: boolean;
     /** 🍇 静默监控 DOM事件 */
     silentDom?: boolean;
     /** 🍇 静默监控 History事件 */
@@ -19,8 +26,50 @@ export interface SilentEventType {
     silentVue?: boolean;
 };
 
+export interface HooksTypes {
+    /**
+     * 🍇 breadcrumb 钩子函数 - 在每次添加用户行为事件前都会调用
+     * @param breadcrumb 由SDK生成的 breadcrumb 事件栈
+     * @param hint 当次的生成的 breadcrumb数据
+     * @returns 如果返回了 null | undefined | boolean 将忽略本次的push
+     */
+    beforePushBreadcrumb?(
+        breadcrumb: Breadcrumb,
+        hint: BreadcrumbPushData
+    ): BreadcrumbPushData | CANCEL;
+    /**
+     * 🍇 上报前 自定义处理钩子， 每次发送事件前会调用
+     * @param event 由SDK生成的 上报数据（有SDK生成的错误事件）
+     * @returns 如果返回了 null | undefined | boolean 将忽略本次的上报
+     */
+    beforeDataReport?(
+        event: TransportDataType
+    ): Promise<TransportDataType | null | CANCEL> | TransportDataType | CANCEL | any | null;
+    /**
+     * 🍇 钩子函数，配置发送到服务端的xhr
+     * 可以对当前xhr实例做一些配置：xhr.setRequestHeader(), xhr.withCredentials
+     * 会在xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8')、
+     * xhr.withCredentials = true,后面调用该函数
+     * @param xhr XMLHttpRequest 实例
+     * @param reportData 上报的数据
+     */
+    configReportXhr?(xhr: XMLHttpRequest, reportData: TransportDataType | any): void;
+    /**
+     * 🍇 钩子函数 每次发送前都会调用
+     * @param event 上报的数据格式
+     * @param url 上报的服务端地址
+     * @memberof HooksTypes
+     */
+    configReportUrl?(event: TransportDataType, url: string): string;
+    /**
+     * 🍇 钩子函数 在 beforeDataReport 后面调用
+     * 在整合上报数据 和 本身SDK信息数据前调用， 当前函数执行完后立即将数据错误信息上报至服务端
+     * trackId 表示用户唯一键（可以是userId）需要 trackerId 的意义可以区分每个错误影响的用户数量
+     */
+    backTrackerId?(): string | number;
+}
 
-export interface InitOptions extends SilentEventType {
+export interface InitOptions extends SilentEventType, HooksTypes {
     /** 🍇 错误监控的 dsn 服务器地址 */
     dsn?: string;
     /** 🍇 true时 整个sdk将禁用 */
