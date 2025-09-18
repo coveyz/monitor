@@ -22,3 +22,19 @@ export const variableTypeDetection = {
     isWindow: isType('Window'),
     isPromise: isType('Promise'),
 };
+
+/** 🍇 检查 数据是否为空 */
+export const isEmpty = (data: any) => {
+    if (data === null || data === undefined) return true;
+    if (typeof data === 'string') return data.trim() === '';
+    if (data instanceof Map || data instanceof Set) {
+        return data.size === 0;
+    }
+    if (typeof data === 'object' || Array.isArray(data)) {
+        for (const _key in data) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+};

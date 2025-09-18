@@ -16,7 +16,6 @@ export const isNodeEnv = variableTypeDetection.isProcess(
 
 /** 🍇 获取 全局变量 */
 export const getGlobal = <T>() => {
-    console.log({ isBrowserEnv, isNodeEnv, }, typeof window)
     if (isBrowserEnv) return window as unknown as MonitorGlobal & T;
     if (isNodeEnv) return process as unknown as MonitorGlobal & T;
 };
