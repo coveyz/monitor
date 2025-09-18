@@ -1,5 +1,11 @@
 export type voidFun = () => void;
 
+export enum EMethods {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+};
 
 /** 🍇 上报错误类型 */
 export enum ErrorTypes {
@@ -46,6 +52,7 @@ export enum BreadCrumbTypes {
     UNHANDLEDREJECTION = 'UnhandledRejection',
     VUE = 'Vue',
     REACT = 'React',
+    RESOURCE = 'Resource',
     CODE_ERROR = 'Code Error',
     CUSTOMER = 'Customer',
     TAP = 'Tap',
@@ -85,11 +92,41 @@ export enum HttpCodes {
     SERVICE_UNAVAILABLE = 503
 };
 
+/** 🍇 等级程度 枚举 */
+export enum Severity {
+    Else = 'else',
+    Error = 'error',
+    Warning = 'warning',
+    Info = 'info',
+    Debug = 'debug',
+    /** 上报等级错误 */
+    Low = 'low',
+    Normal = 'normal',
+    High = 'high',
+    Critical = 'critical'
+};
+
+export enum EActionType {
+    /** 🍇 页面曝光 */
+    PAGE = 'PAGE',
+    /** 🍇 事件埋点 */
+    EVENT = 'EVENT',
+    /** 🍇 区域曝光 */
+    VIEW = 'VIEW',
+    /** 🍇 时长埋点 */
+    DURATION = 'DURATION',
+    /** 🍇 区域曝光的时长埋点 */
+    DURATION_VIEW = 'DURATION_VIEW',
+    /** 🍇 其他买点类型 */
+    OTHER = 'OTHER'
+}
+
 /** 🍇 错误类型正则 */
-export const ERROR_TYPE_RE =/^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/;
+export const ERROR_TYPE_RE = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/;
 
 /** 🍇 全局变量 */
 export const GlobalVar = {
     isLogAddBreadcrumb: true,
     crossOriginThreshold: 1000
 }
+
