@@ -5,6 +5,18 @@ import type { TransportDataType } from './transportData';
 
 type CANCEL = null | undefined | boolean;
 
+type SetRequestHeader = (key: string, value: string) => {};
+interface IRequestHeaderConfig {
+    url: string;
+    method: HttpMethod;
+}
+
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD';
+
+export interface BeforeAppAjaxSendConfig {
+    setRequestHeader: SetRequestHeader;
+}
+
 export interface SilentEventType {
     /** 🍇 静默监控 Xhr事件 */
     silentXhr?: boolean;
@@ -33,10 +45,7 @@ export interface HooksTypes {
      * @param hint 当次的生成的 breadcrumb数据
      * @returns 如果返回了 null | undefined | boolean 将忽略本次的push
      */
-    beforePushBreadcrumb?(
-        breadcrumb: Breadcrumb,
-        hint: BreadcrumbPushData
-    ): BreadcrumbPushData | CANCEL;
+    beforePushBreadcrumb?(breadcrumb: Breadcrumb, hint: BreadcrumbPushData): BreadcrumbPushData | CANCEL;
     /**
      * 🍇 上报前 自定义处理钩子， 每次发送事件前会调用
      * @param event 由SDK生成的 上报数据（有SDK生成的错误事件）
@@ -67,6 +76,12 @@ export interface HooksTypes {
      * trackId 表示用户唯一键（可以是userId）需要 trackerId 的意义可以区分每个错误影响的用户数量
      */
     backTrackerId?(): string | number;
+    /**
+     * 🍇 钩子函数 拦截用户页面的 ajax 请求， 并在ajax请求发送前执行该hook， 可以对用户发送的ajax请求做xhr.setRequestHeader
+     * @param config 当前请求
+     * @param setRequestHeader 
+     */
+    beforeAppAjaxSend?(config: IRequestHeaderConfig, setRequestHeader: BeforeAppAjaxSendConfig): void;
 }
 
 export interface InitOptions extends SilentEventType, HooksTypes {
@@ -86,7 +101,7 @@ export interface InitOptions extends SilentEventType, HooksTypes {
     enableTraceId?: boolean;
     /** 
      * 🍇 如果开启了 enableTraceId,也需要配置该配置项 includeHttpUrlTraceIdRegExp.test(xhr.url)为true时，才会在该请求头中添加traceId
-     * 由于考虑部分接口如果随便加上多余的请求头会造成跨域，所以这边用的是包含关系的正则
+     ** 由于考虑部分接口如果随便加上多余的请求头会造成跨域，所以这边用的是包含关系的正则
      */
     includeHttpUrlTraceIdRegExp?: RegExp;
     /** 🍇 traceId放入请求头中的key 默认是Trace-Id */
