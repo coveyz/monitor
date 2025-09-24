@@ -2,18 +2,9 @@ import { setSilentFlag, logger, _support, validateOption } from '@coveyz/monitor
 import type { InitOptions } from "@coveyz/monitor-types";
 
 import { breadcrumb } from './breadcrumb';
+import { transportData } from './transportData';
 
-
-
-/** 🍇 初始化 initOptions 配置模块 */
-export const initOptions = (paramOptions: InitOptions = {}) => {
-    setSilentFlag(paramOptions);
-    breadcrumb.bindOptions(paramOptions);
-    logger.bindOptions(paramOptions.debug);
-    //TODO: 传输层 transportData 上传数据逻辑
-};
-
-
+/** 🍇 配置项模块 */
 export class Options {
     /** 🍇 默认是关闭traceId，开启时，页面的所有请求都会生成一个uuid，放入请求头中 */
     enableTraceId: boolean;
@@ -51,4 +42,14 @@ export class Options {
     }
 };
 
-export const options = _support.options || (_support.options = new Options())
+export const options = _support.options || (_support.options = new Options());
+
+
+/** 🍇 初始化 initOptions 配置模块 */
+export const initOptions = (paramOptions: InitOptions = {}) => {
+    setSilentFlag(paramOptions);
+    breadcrumb.bindOptions(paramOptions);
+    logger.bindOptions(paramOptions.debug);
+    transportData.bindOptions(paramOptions);
+    options.bindOptions(paramOptions);
+};
