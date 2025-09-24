@@ -1,5 +1,3 @@
-export type voidFun = () => void;
-
 export enum EMethods {
     GET = 'GET',
     POST = 'POST',
