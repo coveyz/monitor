@@ -38,3 +38,7 @@ export const setFlag = (replaceType: EventTypes, isSet: boolean): void => {
     if (replaceFlag[replaceType]) return;
     replaceFlag[replaceType] = isSet;
 };
+
+export const getFlag = (replaceType: EventTypes): boolean => {
+    return !!replaceFlag[replaceType];
+};
