@@ -1,4 +1,4 @@
-
+import type { EventTypes } from '@coveyz/monitor-shared';
 
 export namespace Replace {
     export interface TriggerConsole {
@@ -9,3 +9,10 @@ export namespace Replace {
         to: string;
     }
 }
+
+export type ReplaceCallback = (data: any) => void;
+
+export interface ReplaceHandler {
+    type: EventTypes;
+    callback: ReplaceCallback;  
+};
