@@ -1,4 +1,4 @@
-import { setSilentFlag, logger, _support, validateOption } from '@coveyz/monitor-utils';
+import { setSilentFlag, logger, _support, validateOption, generateUUID } from '@coveyz/monitor-utils';
 import type { InitOptions } from "@coveyz/monitor-types";
 
 import { breadcrumb } from './breadcrumb';
@@ -44,6 +44,24 @@ export class Options {
 
 export const options = _support.options || (_support.options = new Options());
 
+
+/** 
+ * 🍇 设置 链路追踪ID
+ ** 为请求生成 唯一标识符 traceId
+ ** 通过 回调函数将来 traceId 添加到请求头中
+*/
+export const setTraceId = (
+    httpUrl: string,
+    callback: (headerFieldName: string, traceId: string) => void
+) => {
+    const { includeHttpUrlTraceIdRegExp, enableTraceId } = options;
+
+    if (enableTraceId && includeHttpUrlTraceIdRegExp && includeHttpUrlTraceIdRegExp.test(httpUrl)) {
+        const traceId = generateUUID();
+        callback(options.traceIdFieldName, traceId);
+    };
+    
+};
 
 /** 🍇 初始化 initOptions 配置模块 */
 export const initOptions = (paramOptions: InitOptions = {}) => {

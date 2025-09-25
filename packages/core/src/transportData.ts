@@ -153,7 +153,7 @@ export class TransportData {
                     logger.error('xhr send fail');
                 }
             };
-            
+
             xhr.send(JSON.stringify(data));
         };
 
@@ -193,6 +193,11 @@ export class TransportData {
 
         // TODO: wxMiniEnv
 
+    };
+    /** 🍇 是否为 SDK 自身的上报请求 */
+    isSdkTransportUrl(targetUrl: string) {
+        if (!targetUrl) return false;
+        return [this.errorDsn, this.trackDsn].some(dsn => dsn && targetUrl.includes(dsn));
     };
     /** 🍇 绑定 初始化 选项 */
     bindOptions(options: InitOptions = {}) {

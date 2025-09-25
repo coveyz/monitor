@@ -1,4 +1,4 @@
-import { getFlag, setFlag } from "@coveyz/monitor-utils";
+import { getFlag, setFlag, nativeTryCatch, logger, getFunctionName } from "@coveyz/monitor-utils";
 import type { EventTypes } from "@coveyz/monitor-shared";
 import type { ReplaceCallback, ReplaceHandler } from "@coveyz/monitor-types";
 
@@ -16,4 +16,25 @@ export const subscribeEvent = (handler: ReplaceHandler): boolean => {
     handlers[handler.type].push(handler.callback);
 
     return true;
+};
+
+/**
+ * 🍇 事件分发中心： 
+ * @param type 事件类型
+ */
+export const triggerHandlers = (type: EventTypes, data: any): void => {
+    if (!type || !handlers[type]) return;
+
+    handlers[type].forEach((callback) => {
+        nativeTryCatch(() => {
+            callback(data);
+        }, (error) => {
+            logger.error(
+                `重写事件triggerHandlers的回调函数发生错误\nType:${type}\nName: ${getFunctionName(
+                    callback,
+                )}\nError: ${error}`,
+            )
+        });
+    });
+
 };
