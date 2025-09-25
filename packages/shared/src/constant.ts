@@ -117,6 +117,46 @@ export enum EActionType {
     DURATION_VIEW = 'DURATION_VIEW',
     /** 🍇 其他买点类型 */
     OTHER = 'OTHER'
+};
+
+/**
+ * 🍇 一次具体的操作/调用的时间片  具体状态
+ */
+export enum SpanStatus {
+    /** 🍇 操作成功完成。 */
+    Ok = 'ok',
+    /** 🍇 操作未完成，截止时间已过。 */
+    DeadlineExceeded = 'deadline_exceeded',
+    /** 🍇 401 未认证（根据 RFC 7235 实际表示未认证）。 */
+    Unauthenticated = 'unauthenticated',
+    /** 🍇 403 禁止访问。 */
+    PermissionDenied = 'permission_denied',
+    /** 🍇 404 未找到。某些请求的实体（文件或目录）未找到。 */
+    NotFound = 'not_found',
+    /** 🍇 429 请求过多。 */
+    ResourceExhausted = 'resource_exhausted',
+    /** 🍇 客户端指定了无效参数。4xx。 */
+    InvalidArgument = 'invalid_argument',
+    /** 🍇 501 未实现。 */
+    Unimplemented = 'unimplemented',
+    /** 🍇 503 服务不可用。 */
+    Unavailable = 'unavailable',
+    /** 🍇 其他/通用 5xx 错误。 */
+    InternalError = 'internal_error',
+    /** 🍇 未知。任何非标准 HTTP 状态码。 */
+    UnknownError = 'unknown_error',
+    /** 🍇 操作被取消（通常由用户取消）。 */
+    Cancelled = 'cancelled',
+    /** 🍇 已存在（409）。 */
+    AlreadyExists = 'already_exists',
+    /** 🍇 操作被拒绝，因为系统未处于操作所需的状态。 */
+    FailedPrecondition = 'failed_precondition',
+    /** 🍇 操作被中止，通常由于并发问题。 */
+    Aborted = 'aborted',
+    /** 🍇 操作尝试超出有效范围。 */
+    OutOfRange = 'out_of_range',
+    /** 🍇 不可恢复的数据丢失或损坏。 */
+    DataLoss = 'data_loss'
 }
 
 /** 🍇 错误类型正则 */

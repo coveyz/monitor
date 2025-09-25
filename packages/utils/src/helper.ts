@@ -1,4 +1,4 @@
-import { GlobalVar } from '@coveyz/monitor-shared';
+import { GlobalVar, SpanStatus } from '@coveyz/monitor-shared';
 import type { ReportDataType, TrackReportData, AnyObj, TotalEventName, voidFun } from '@coveyz/monitor-types';
 
 import { logger } from './logger';
@@ -122,3 +122,33 @@ export function getFunctionName(fn: unknown): string {
     }
     return fn.name || defaultFunction;
 };
+
+/** 🍇 根据状态码 返回描述信息 */
+export const fromHttpStatus = (httpStatus: number): string => {
+    if (httpStatus < 400) return SpanStatus.Ok;
+
+    if (httpStatus >= 400 && httpStatus < 500) {
+        switch (httpStatus) {
+            case 401:
+                return SpanStatus.Unauthenticated;
+            case 403:
+                return SpanStatus.PermissionDenied;
+            case 404:
+                return SpanStatus.NotFound;
+            case 409:
+                return SpanStatus.AlreadyExists;
+            case 413:
+                return SpanStatus.FailedPrecondition;
+            case 429:
+                return SpanStatus.ResourceExhausted;
+            default:
+                return SpanStatus.InternalError;
+        }
+    };
+};
+
+export const getLocationHref = ( ): string => {
+    if (typeof document === 'undefined' || document.location === null) return '';
+
+    return document.location.href;
+}
