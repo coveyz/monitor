@@ -1,5 +1,7 @@
-import { EventTypes } from '@coveyz/monitor-shared';
+import { BreadCrumbTypes, EventTypes } from '@coveyz/monitor-shared';
+
 import { addReplaceHandler } from './replace';
+import { HandleEvents } from './handleEvents';
 
 /**
  * 🍇 为各种事件设置替换处理程序
@@ -9,7 +11,7 @@ export const setupReplace = (): void => {
     addReplaceHandler({
         type: EventTypes.XHR,
         callback: (data) => {
-            console.log('xhr data', data);
+            HandleEvents.handleHttp(data, BreadCrumbTypes.XHR)
         }
     })
 };
