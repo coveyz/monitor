@@ -17,7 +17,7 @@ export const setupReplace = (): void => {
     addReplaceHandler({
         type: EventTypes.FETCH,
         callback: (data) => {
-            console.log('fetch', data);
+            // console.log('fetch', data);
         }
     })
 };
