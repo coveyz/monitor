@@ -1,5 +1,5 @@
 import { GlobalVar } from '@coveyz/monitor-shared';
-import type { ReportDataType, TrackReportData, AnyObj, TotalEventName } from '@coveyz/monitor-types';
+import type { ReportDataType, TrackReportData, AnyObj, TotalEventName, voidFun } from '@coveyz/monitor-types';
 
 import { logger } from './logger';
 
@@ -71,4 +71,54 @@ export function on(
     options: boolean | unknown = false
 ) {
     target.addEventListener(eventName, handler, options);
+};
+
+/**
+ * 🍇 生成符合 UUID v4 格式的唯一标识符
+ ** 返回格式： xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+ */
+export const generateUUID = () => {
+    let d = new Date().getTime(); // 时间戳中字
+
+    /**
+     * 🍇 替换模版
+     ** x：需要替换为随机的16进制字符（0-9, a-f）
+     ** y：需要替换为特定范围的16进制字符（8, 9, a, b）
+     ** 4：固定字符，表示UUID版本4
+     */
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (d + Math.random() * 16) % 16 | 0; // 随机数 0-16 // ｜ 相当于 Math.floor
+        d = Math.floor(d / 16); // 消耗时间戳 避免重复
+        // 🍇 如果当前是 x 直接返回 r的十六进制， 
+        // 🍇 如果是 y， 
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    })
+
+    return uuid;
+}
+
+/** 
+ * 🍇 错误捕获 
+ ** 确保单个事件处理器 出错时 不会影响其他代码执行
+ ** 记录哪个处理器出现了错误
+ */
+export function nativeTryCatch(fn: voidFun, errorFn?: (err: any) => void): void {
+    try {
+        fn();
+    } catch (error) {
+        console.log('error', error);
+        errorFn && errorFn(error);
+    }
+};
+
+export const defaultFunction = '<anonymous>';
+
+/**
+ * 🍇 获取函数名称, 匿名函数返回 <anonymous>
+ */
+export function getFunctionName(fn: unknown): string {
+    if (!fn || typeof fn !== 'function') {
+        return defaultFunction;
+    }
+    return fn.name || defaultFunction;
 };
