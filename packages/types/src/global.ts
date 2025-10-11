@@ -26,10 +26,10 @@ export interface MonitorHttp {
     method?: string;
     url?: string;
     status?: number;
+    responseText?: any;
     reqData?: any;
     sTime?: number;
     elapsedTime?: number;
-    responseText?: any;
     time?: number;
     isSdkUrl?: boolean;
     errMsg?: string;

@@ -1,9 +1,9 @@
 import { subscribeEvent, options, setTraceId, transportData, triggerHandlers } from '@coveyz/monitor-core';
 import { _global, getTimestamp, on, replaceOld, variableTypeDetection } from '@coveyz/monitor-utils';
-import { EMethods, EventTypes, HttpTypes } from '@coveyz/monitor-shared';
+import { EMethods, EventTypes, HttpTypes, HttpCodes } from '@coveyz/monitor-shared';
 import type { MonitorHttp, MonitorXMLHttpRequest, ReplaceHandler, voidFun } from '@coveyz/monitor-types';
 
-
+/** 🍇 过滤请求URL */
 const isFilterHttpUrl = (url: string) => {
     return options.filterXhrUrlRegExp && options.filterXhrUrlRegExp.test(url);
 }
@@ -48,7 +48,7 @@ function xhrReplace(): void {
                 const { responseType, response, status } = this;
                 this.monitor_xhr.reqData = args[0];
                 const eTime = getTimestamp();
-                this.monitor_xhr.time =  eTime;
+                this.monitor_xhr.time = eTime;
                 this.monitor_xhr.status = status;
                 // 🍇 处理 响应体数据
                 if (['', 'json', 'text'].indexOf(responseType) !== -1) {
@@ -64,11 +64,88 @@ function xhrReplace(): void {
     })
 };
 
+/** 🍇 重写 fetch 的相关方法 */
+function fetchReplace(): void {
+    // 🍇 环境监测
+    if (!('fetch' in _global)) return;
+
+    replaceOld(_global, 'fetch', (originalFetch) => {
+        return function (url: string, config: Partial<Request> = {}): void {
+            // 🍇 数据收集
+            const sTime = getTimestamp();
+            const method = (config && config.method) || 'GET';
+            let handlerData: MonitorHttp = {
+                type: HttpTypes.FETCH,
+                method,
+                url,
+                reqData: config && config.body,
+            }
+            // 🍇 请求头处理 & 链路追踪
+            let headers = new Headers(config.headers || {});
+            Object.assign(headers, {
+                setRequestHeader: headers.set
+            });
+            setTraceId(url, (headerFieldName, traceId) => {
+                handlerData.traceId = traceId;
+                headers.set(headerFieldName, traceId);
+            });
+            // 🍇 调用用户配置的钩子函数
+            options.beforeAppAjaxSend && options.beforeAppAjaxSend({ method, url }, headers);
+            config = { ...config, headers };
+
+            originalFetch.apply(_global, [url, config]).then(
+                (res: Response) => {
+                    // 🍇 克隆响应体 
+                    const tmpRes = res.clone();
+                    const eTime = getTimestamp();
+
+                    handlerData = {
+                        ...handlerData,
+                        elapsedTime: eTime - sTime,
+                        status: tmpRes.status,
+                        time: sTime,
+                    };
+
+                    tmpRes.text().then((data) => {
+                        // 🍇 过滤逻辑： 跳过SDK自身请求 和 需要被过滤URL
+                        if(method === EMethods.POST && transportData.isSdkTransportUrl(url)) return;
+                        if (isFilterHttpUrl(url)) return;
+
+                        // 🍇 只在错误状态码的情况下 记录响应内容 （避免大量数据）
+                        handlerData.responseText = tmpRes.status > HttpCodes.UNAUTHORIZED && data;
+                        // 🍇 触发请求完成事件
+                        triggerHandlers(EventTypes.FETCH, handlerData);
+                    });
+                    return res;
+                },
+                (err: Error) => {
+                    const eTime = getTimestamp();
+                    if (method === EMethods.POST && transportData.isSdkTransportUrl(url)) return;
+                    if (isFilterHttpUrl(url)) return;
+
+                    handlerData = {
+                        ...handlerData,
+                        elapsedTime: eTime - sTime,
+                        status: 0,
+                        time: sTime,
+                    };
+
+                    triggerHandlers(EventTypes.FETCH, handlerData);
+                    throw err;
+                }
+            )
+        }
+    })
+};
+
 /** 🍇 根据事件类型 调用对应的拦截器去访问 */
 const replace = (type: EventTypes) => {
     switch (type) {
         case EventTypes.XHR:
             xhrReplace();
+            break;
+        case EventTypes.FETCH:
+            fetchReplace();
             break;
         default:
             break;
@@ -78,6 +155,6 @@ const replace = (type: EventTypes) => {
 /** 🍇 添加重写处理器 */
 export const addReplaceHandler = (handler: ReplaceHandler): void => {
     if (!subscribeEvent(handler)) return;
-    console.log('addReplaceHandler', handler);
+    // console.log('addReplaceHandler', handler);
     replace(handler.type);
 };

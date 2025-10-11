@@ -11,13 +11,14 @@ export const setupReplace = (): void => {
     addReplaceHandler({
         type: EventTypes.XHR,
         callback: (data) => {
-            HandleEvents.handleHttp(data, BreadCrumbTypes.XHR)
+            HandleEvents.handleHttp(data, BreadCrumbTypes.XHR);
         }
-    }),
+    });
     addReplaceHandler({
         type: EventTypes.FETCH,
         callback: (data) => {
             console.log('fetch', data);
+            HandleEvents.handleHttp(data, BreadCrumbTypes.FETCH);
         }
-    })
+    });
 };
