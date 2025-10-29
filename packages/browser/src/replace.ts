@@ -138,6 +138,13 @@ function fetchReplace(): void {
     })
 };
 
+/** 🍇 重写 拦截全局 error 事件 */
+function listenError(): void {
+    on(_global, 'error', function(e: ErrorEvent) {
+        triggerHandlers(EventTypes.ERROR, e);
+    });
+};
+
 /** 🍇 根据事件类型 调用对应的拦截器去访问 */
 const replace = (type: EventTypes) => {
     switch (type) {
@@ -146,6 +153,9 @@ const replace = (type: EventTypes) => {
             break;
         case EventTypes.FETCH:
             fetchReplace();
+            break;
+        case EventTypes.ERROR: 
+            listenError();
             break;
         default:
             break;

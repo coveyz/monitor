@@ -1,8 +1,13 @@
 import { GlobalVar, SpanStatus, ErrorTypes, Severity } from "@coveyz/monitor-shared";
-import { MonitorHttp, ReportDataType } from "@coveyz/monitor-types";
-import { fromHttpStatus, getLocationHref } from "@coveyz/monitor-utils";
+import { MonitorHttp, ReportDataType, ResourceErrorTarget } from "@coveyz/monitor-types";
+import { fromHttpStatus, getLocationHref, getTimestamp, interceptStr } from "@coveyz/monitor-utils";
 
 import { getRealPath } from "./errorId";
+
+const resourceMap = {
+    img: '图片',
+    script: 'js脚本',
+}
 
 
 /** 🍇 http请求信息转换 统一格式 */
@@ -45,5 +50,17 @@ export const httpTransform = (data: MonitorHttp): ReportDataType => {
             status,
             data: data.responseText
         }
+    }
+};
+
+/** 🍇 转换资源为标准模式 */
+export const resourceTransform = (target: ResourceErrorTarget): ReportDataType => {
+    return {
+        type: ErrorTypes.RESOURCE_ERROR,
+        url: getLocationHref(),
+        message: `资源地址：${interceptStr(target.src, 120) || interceptStr(target.href, 120)}`,
+        level: Severity.Low,
+        time: getTimestamp(),
+        name: `${resourceMap[target.localName] || target.localName}加载失败`,
     }
 };

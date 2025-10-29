@@ -2,6 +2,7 @@ import { GlobalVar, SpanStatus } from '@coveyz/monitor-shared';
 import type { ReportDataType, TrackReportData, AnyObj, TotalEventName, voidFun } from '@coveyz/monitor-types';
 
 import { logger } from './logger';
+import { variableTypeDetection } from './is';
 
 
 /** 🍇 获取 当前的时间戳 */
@@ -152,3 +153,13 @@ export const getLocationHref = ( ): string => {
 
     return document.location.href;
 }
+
+export const interceptStr = (str: string, interceptLength: number): string => {
+    if (variableTypeDetection.isString(str)) {
+        return (
+            str.slice(0, interceptLength) +
+            (str.length > interceptLength ? `:截取前${interceptLength}个字符` : '')
+        );
+    };
+    return ''
+};

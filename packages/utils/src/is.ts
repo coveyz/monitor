@@ -38,3 +38,28 @@ export const isEmpty = (data: any) => {
     }
     return false;
 };
+
+export const isInstanceOf = (wat: any, base: any): boolean => {
+    try {
+        return wat instanceof base;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const isError = (wat: any): boolean => {
+    switch (nativeToString.call(wat)) {
+        case '[object Error]':
+        case '[object Exception]':
+        case '[object DOMException]':
+        case '[object EvalError]':
+        case '[object RangeError]':
+        case '[object ReferenceError]':
+        case '[object SyntaxError]':
+        case '[object TypeError]':
+        case '[object URIError]':
+            return true;
+        default:
+            return isInstanceOf(wat, Error);
+    }
+};
