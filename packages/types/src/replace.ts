@@ -2,7 +2,8 @@ import type { EventTypes } from '@coveyz/monitor-shared';
 
 export namespace Replace {
     export interface TriggerConsole {
-
+        args: any[];
+        level: string;
     }
     export interface IRoute {
         from: string;

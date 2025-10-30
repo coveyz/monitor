@@ -44,7 +44,7 @@ export const HandleEvents = {
     handleError(errorEvent: ErrorEvent) {
         const target = errorEvent.target as ResourceErrorTarget;
 
-        // 🍇 判断错误类型
+        // 🍇 判断错误类型 ->  资源加载错误
         if (target.localName) {
             // 🍇 资源加载错误 提取有用数据 (图片， css， js 文件等)
             const data = resourceTransform(errorEvent.target as ResourceErrorTarget);
@@ -59,12 +59,14 @@ export const HandleEvents = {
             return transportData.send(data);
         };
 
-        // 🍇 code error Javascript执行错误
+        // 🍇 code error Javascript执行错误 -> JS执行错误
         const { message, filename, lineno, colno, error } = errorEvent;
         let result: ReportDataType;
+        // 🍇 优先处理完整的Error对象，包含stack， trace
         if (error && isError(error)) {
             result = extractErrorStack(error, Severity.Normal)
         };
+        // 🍇 else fallback 手动构造错误信息
         result || (result = HandleEvents.handleNotErrorInstance(message, filename, lineno, colno));
         // 🍇 标准化 & 上报
         result.type = ErrorTypes.JAVASCRIPT_ERROR;

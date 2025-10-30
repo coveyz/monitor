@@ -2,6 +2,7 @@ import { BreadCrumbTypes, EventTypes } from '@coveyz/monitor-shared';
 
 import { addReplaceHandler } from './replace';
 import { HandleEvents } from './handleEvents';
+import { handleConsole } from '@coveyz/monitor-core';
 
 /**
  * 🍇 为各种事件设置替换处理程序
@@ -17,16 +18,19 @@ export const setupReplace = (): void => {
     addReplaceHandler({
         type: EventTypes.FETCH,
         callback: (data) => {
-            console.log('fetch', data);
             HandleEvents.handleHttp(data, BreadCrumbTypes.FETCH);
         }
     });
-
     addReplaceHandler({
         type: EventTypes.ERROR,
         callback: (error) => {
             HandleEvents.handleError(error);
         }
+    });
+    addReplaceHandler({
+        type: EventTypes.CONSOLE,
+        callback: (data) => {
+            handleConsole(data);
+        }
     })
-
 };

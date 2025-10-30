@@ -145,6 +145,27 @@ function listenError(): void {
     });
 };
 
+/** 🍇 重写 console  */
+function consoleReplace(): void {
+    if (!('console' in _global)) return;
+
+    const logType = ['log', 'info', 'warn', 'debug', 'error', 'assert'];
+    logType.forEach(function(level: string): void {
+        if (!(level in _global.console)) return;
+
+        replaceOld(_global.console, level, function (originalConsole: () => any): Function {
+            return function (...args: any[]): void {
+                if (originalConsole) {
+                    // 🍇 触发监听
+                    triggerHandlers(EventTypes.CONSOLE, { args, level });
+                    // 🍇 调用 console 的方法
+                    originalConsole.apply(_global.console, args);
+                };
+            };
+        })
+    });
+}
+
 /** 🍇 根据事件类型 调用对应的拦截器去访问 */
 const replace = (type: EventTypes) => {
     switch (type) {
@@ -157,6 +178,8 @@ const replace = (type: EventTypes) => {
         case EventTypes.ERROR: 
             listenError();
             break;
+        case EventTypes.CONSOLE: 
+            consoleReplace();
         default:
             break;
     }

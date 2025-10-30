@@ -1,8 +1,9 @@
-import { GlobalVar, SpanStatus, ErrorTypes, Severity } from "@coveyz/monitor-shared";
-import { MonitorHttp, ReportDataType, ResourceErrorTarget } from "@coveyz/monitor-types";
-import { fromHttpStatus, getLocationHref, getTimestamp, interceptStr } from "@coveyz/monitor-utils";
+import { GlobalVar, SpanStatus, ErrorTypes, Severity, BreadCrumbTypes } from "@coveyz/monitor-shared";
+import { MonitorHttp, Replace, ReportDataType, ResourceErrorTarget } from "@coveyz/monitor-types";
+import { fromHttpStatus, getLocationHref, getTimestamp, interceptStr, severityFromString } from "@coveyz/monitor-utils";
 
 import { getRealPath } from "./errorId";
+import { breadcrumb } from "./breadcrumb";
 
 const resourceMap = {
     img: '图片',
@@ -63,4 +64,15 @@ export const resourceTransform = (target: ResourceErrorTarget): ReportDataType =
         time: getTimestamp(),
         name: `${resourceMap[target.localName] || target.localName}加载失败`,
     }
+};
+
+export const handleConsole = (data: Replace.TriggerConsole): void => {
+    if (GlobalVar.isLogAddBreadcrumb) {
+        breadcrumb.push({
+            type: BreadCrumbTypes.CONSOLE,
+            category: breadcrumb.getCategory(BreadCrumbTypes.CONSOLE),
+            data,
+            level: severityFromString(data.level)
+        })
+    };
 };
